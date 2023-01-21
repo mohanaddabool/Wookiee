@@ -29,12 +29,10 @@ public class WookieeContext: IdentityDbContext<IdentityUser>
         builder.Entity<IdentityUser>().Property(t => t.ConcurrencyStamp).IsRequired();
         builder.Entity<User>().HasIndex(t => t.AuthorPseudonym).IsUnique();
         base.OnModelCreating(builder);
-        //builder.Entity<User>().Property(t => t.CreatedOn).IsRequired();
-        //builder.Entity<IdentityUser>().Property(t => t.UserName).IsRequired();
-        //builder.Entity<IdentityUser>(entity =>
-        //{
-        //    entity.ToTable(name: "Users");
-        //});
+        builder.Entity<IdentityUser>(entity =>
+        {
+            entity.ToTable(name: "Users");
+        });
     }
 
     public DbSet<User> User { get; set; }

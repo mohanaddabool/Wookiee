@@ -12,8 +12,8 @@ using Wookiee.Repository.Context;
 namespace Wookiee.Repository.Migrations
 {
     [DbContext(typeof(WookieeContext))]
-    [Migration("20230119165744_init2")]
-    partial class init2
+    [Migration("20230121223909_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -148,7 +148,7 @@ namespace Wookiee.Repository.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("Users", (string)null);
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUser");
 
