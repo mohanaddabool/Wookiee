@@ -5,7 +5,7 @@
 namespace Wookiee.Repository.Migrations
 {
     /// <inheritdoc />
-    public partial class init2 : Migration
+    public partial class Init2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
