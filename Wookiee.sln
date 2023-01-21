@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wookiee.Model", "Wookiee.Model\Wookiee.Model.csproj", "{93759142-77F6-42E9-9E4F-34DEED610DC9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wookiee.Repository", "Wookiee.Repository\Wookiee.Repository.csproj", "{9AC92545-8F28-4434-85FC-6B990AB3BC44}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wookiee.Service", "Wookiee.Service\Wookiee.Service.csproj", "{CA194CB3-17DE-4F90-A880-79A1C91BA23C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wookiee.WebAppApi", "Wookiee\Wookiee.WebAppApi.csproj", "{493D6B31-2EFB-4CFF-9CA6-971DBCB9300C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wookiee.Utility", "Wookiee.Utility\Wookiee.Utility.csproj", "{9F42DD58-8879-476B-B95E-3D603F86FD66}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wookiee.Service.Test", "Wookiee.Service.Test\Wookiee.Service.Test.csproj", "{75A46368-3538-44B4-92D3-76AF7F1088C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wookiee.WebAppApi.Test", "Wookiee.WebAppApi.Test\Wookiee.WebAppApi.Test.csproj", "{9590A507-BA66-4ABD-A47B-B0F7693EDBEF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{93759142-77F6-42E9-9E4F-34DEED610DC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93759142-77F6-42E9-9E4F-34DEED610DC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93759142-77F6-42E9-9E4F-34DEED610DC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93759142-77F6-42E9-9E4F-34DEED610DC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AC92545-8F28-4434-85FC-6B990AB3BC44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AC92545-8F28-4434-85FC-6B990AB3BC44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AC92545-8F28-4434-85FC-6B990AB3BC44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AC92545-8F28-4434-85FC-6B990AB3BC44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA194CB3-17DE-4F90-A880-79A1C91BA23C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA194CB3-17DE-4F90-A880-79A1C91BA23C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA194CB3-17DE-4F90-A880-79A1C91BA23C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA194CB3-17DE-4F90-A880-79A1C91BA23C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{493D6B31-2EFB-4CFF-9CA6-971DBCB9300C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{493D6B31-2EFB-4CFF-9CA6-971DBCB9300C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{493D6B31-2EFB-4CFF-9CA6-971DBCB9300C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{493D6B31-2EFB-4CFF-9CA6-971DBCB9300C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F42DD58-8879-476B-B95E-3D603F86FD66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F42DD58-8879-476B-B95E-3D603F86FD66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F42DD58-8879-476B-B95E-3D603F86FD66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F42DD58-8879-476B-B95E-3D603F86FD66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75A46368-3538-44B4-92D3-76AF7F1088C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75A46368-3538-44B4-92D3-76AF7F1088C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75A46368-3538-44B4-92D3-76AF7F1088C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75A46368-3538-44B4-92D3-76AF7F1088C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9590A507-BA66-4ABD-A47B-B0F7693EDBEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9590A507-BA66-4ABD-A47B-B0F7693EDBEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9590A507-BA66-4ABD-A47B-B0F7693EDBEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9590A507-BA66-4ABD-A47B-B0F7693EDBEF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6A18C77A-D72F-4C24-80E8-EF59A947474C}
+	EndGlobalSection
+EndGlobal
