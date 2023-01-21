@@ -82,10 +82,12 @@ jobs:
       run: dotnet test
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
-    - name: Restore the application
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
-      env:
-        Configuration: ${{ matrix.configuration }}
+    - displayName: 'dotnet restore'
+    inputs:
+        command: restore
+        projects: '**/*.sln'
+        vstsFeed: 'a434c328-6f6a-4962-b1a2-95afde90fb9f'
+        includeNuGetOrg: false
 
     # Decode the base 64 encoded pfx and save the Signing_Certificate
     - name: Decode the pfx
