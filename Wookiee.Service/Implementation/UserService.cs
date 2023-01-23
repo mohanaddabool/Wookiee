@@ -1,10 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+﻿using Microsoft.Extensions.Logging;
 using Wookiee.Model.Entities;
 using Wookiee.Repository.Interface;
 using Wookiee.Service.Interface;
@@ -51,35 +45,14 @@ public class UserService: IUserService
             },
                 user.Password!);
 
-            if (identityResult.Succeeded)
-            {
-                return new ResponseObject<string>
-                {
-                    Result = "User is created",
-                    Exception = null,
-                    ErrorMessage = null,
-                    IsSuccess = identityResult.Succeeded,
-                };
-            }
-            return new ResponseObject<string>
-            {
-                Exception = null,
-                ErrorMessage = identityResult.Errors.Select(x => x.Description),
-                Result = "User is not created please check the error message",
-                IsSuccess = identityResult.Succeeded,
-            };
+            return identityResult.Succeeded 
+                ? Mapper.user.MapToUserResponseObject.ToResponseObject("User is created", identityResult.Succeeded, null, null)
+                : Mapper.user.MapToUserResponseObject.ToResponseObject(null, identityResult.Succeeded, identityResult.Errors.Select(x => x.Description), null);
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Register user going wrong");
-            return new ResponseObject<string>
-            {
-                Result = e.Message,
-                ErrorMessage = e.Message,
-                IsSuccess = false,
-                Exception = e
-            };
-
+            return Mapper.user.MapToUserResponseObject.ToResponseObject(null, false, e.Message, e);
         }
     }
 
@@ -89,54 +62,26 @@ public class UserService: IUserService
         {
             var user = await _userRepository.FindByEmail(loginDto.Email!);
             if (user == null)
-            {
-                return new ResponseObject<string>
-                {
-                    Exception = null,
-                    ErrorMessage = "Login failed, please check email or password",
-                    IsSuccess = false,
-                    Result = "Please check your email address",
-                };
-            }
+                return Mapper.user.MapToUserResponseObject.ToResponseObject(null, false,
+                    "Login failed, please check email or password", null);
+
             var signInResult = await _userRepository.Login(user.UserName!, loginDto.Password!, loginDto.RememberMe);
             if (!signInResult.Succeeded)
-                return new ResponseObject<string>
-                {
-                    Exception = null,
-                    ErrorMessage = "Login failed, please check email or password",
-                    IsSuccess = signInResult.Succeeded,
-                    Result = "Login failed, please check email or password",
-                };
+                return Mapper.user.MapToUserResponseObject.ToResponseObject(null, false,
+                "Login failed, please check email or password", null);
 
             if (!string.IsNullOrWhiteSpace(user.Id))
-            {
-                return new ResponseObject<string>
-                {
-                    IsSuccess = signInResult.Succeeded,
-                    Result = _helper.CreateToken(user.Id, user.UserName!),
-                    ErrorMessage = null,
-                    Exception = null,
-                };
-            }
+                return Mapper.user.MapToUserResponseObject.ToResponseObject(_helper.CreateToken(user.Id, user.UserName!), true,
+                    null, null);
 
-            return new ResponseObject<string>
-            {
-                Result = null,
-                ErrorMessage = "Login failed, please check email or password",
-                IsSuccess = signInResult.Succeeded,
-                Exception = null,
-            };
+            return Mapper.user.MapToUserResponseObject.ToResponseObject(null, false,
+                "Login failed, please check email or password", null);
         }
         catch (Exception e)
         {
             _logger.LogError(e, "login going wrong");
-            return new ResponseObject<string>
-            {
-                Exception = e,
-                ErrorMessage = e.Message,
-                IsSuccess = false,
-                Result = null,
-            };
+            return Mapper.user.MapToUserResponseObject.ToResponseObject(null, false,
+                e.Message, e);
         }
 
     }
