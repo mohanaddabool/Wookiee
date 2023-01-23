@@ -176,6 +176,27 @@ public class BookService: IBookService
     {
         try
         {
+            var book = await _bookRepository.ReadBook(id);
+            if (book == null)
+                return new ResponseObject<List<BookInfoDto>>
+                {
+                    Exception = null,
+                    ErrorMessage = "Book not found",
+                    IsSuccess = false,
+                    Result = null
+                };
+
+            if (!book.Author!.Id.Equals(_helper.GetLoggedId()))
+            {
+                return new ResponseObject<List<BookInfoDto>>
+                {
+                    ErrorMessage = "This book is not owned by you",
+                    IsSuccess = false,
+                    Exception = null,
+                    Result = null,
+                };
+            }
+
             _bookRepository.DeleteBook(id);
             return await ReadList();
         }

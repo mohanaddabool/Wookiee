@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <Folder Include="Model\Book\" />
+    <Folder Include="Helper\" />
   </ItemGroup>
 
 </Project>

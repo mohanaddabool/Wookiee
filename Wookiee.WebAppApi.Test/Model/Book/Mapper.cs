@@ -12,7 +12,8 @@ public static class Mapper
         {
             Description = "Test description",
             Price = 50.50M,
-            Title = "Test title"
+            Title = "Test title",
+            Image = null,
         };
     }
 
@@ -24,6 +25,7 @@ public static class Mapper
             Price = 50.50M,
             Title = "Test title",
             Id = 1,
+            Image = null,
         };
     }
 

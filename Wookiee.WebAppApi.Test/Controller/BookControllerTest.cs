@@ -1,12 +1,19 @@
 ﻿using Castle.Components.DictionaryAdapter.Xml;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting.Internal;
+using Microsoft.Extensions.Hosting;
 using Moq;
 using NuGet.Frameworks;
 using NUnit.Framework;
+using System.Collections;
 using Wookiee.Service.Interface;
 using Wookiee.Service.Model.Book;
 using Wookiee.Service.Model.User;
+using Wookiee.Utility;
 using Wookiee.WebAppApi.Controllers;
+using Wookiee.WebAppApi.Test.Helper;
 using Wookiee.WebAppApi.Test.Model.Book;
 
 namespace Wookiee.WebAppApi.Test.Controller;
@@ -15,13 +22,15 @@ namespace Wookiee.WebAppApi.Test.Controller;
 public class BookControllerTest
 {
     private Mock<IBookService> _bookServiceMock;
+    private Mock<IHelper> _helperMock;
     private BookController _bookController;
 
     [SetUp]
     public void Setup()
     {
         _bookServiceMock = new Mock<IBookService>();
-        _bookController = new BookController(_bookServiceMock.Object);
+        _helperMock = new Mock<IHelper>();
+        _bookController = new BookController(_bookServiceMock.Object, _helperMock.Object);
     }
 
     [Test]
@@ -29,7 +38,7 @@ public class BookControllerTest
     {
         _bookController.ModelState.AddModelError("Error", "Something wrong");
 
-        var result = (BadRequestResult) await _bookController.Create(Mapper.ToCreate(), null);
+        var result = (BadRequestResult) await _bookController.Create(Mapper.ToCreate());
         Assert.That(result, Is.Not.Null);
         Assert.AreEqual(result.StatusCode, 400);
     }
@@ -39,7 +48,7 @@ public class BookControllerTest
     {
         _bookController.ModelState.AddModelError("Error", "Something wrong");
 
-        var result = (BadRequestResult)await _bookController.Update(Mapper.ToUpdate(), null);
+        var result = (BadRequestResult)await _bookController.Update(Mapper.ToUpdate());
         Assert.That(result, Is.Not.Null);
         Assert.AreEqual(result.StatusCode, 400);
     }
@@ -65,9 +74,10 @@ public class BookControllerTest
         // Arrange
         _bookServiceMock.Setup(service => service.Create(It.IsAny<AddBookDto>()))
             .ReturnsAsync(Mapper.ToResponseObject);
+        _helperMock.Setup(method => method.ImageValidation(null)).Returns(new Dictionary<bool, string?> { { true, null } });
 
         // Act
-        var result = await _bookController.Create(Mapper.ToCreate(), null);
+        var result = await _bookController.Create(Mapper.ToCreate());
 
         //Assert
         Assert.That(result, Is.Not.Null);
@@ -81,9 +91,10 @@ public class BookControllerTest
         // Arrange
         _bookServiceMock.Setup(service => service.Update(It.IsAny<UpdateBookDto>()))
             .ReturnsAsync(Mapper.ToResponseObject);
+        _helperMock.Setup(method => method.ImageValidation(null)).Returns(new Dictionary<bool, string?> {{true, null}});
 
         // Act
-        var result = await _bookController.Update(Mapper.ToUpdate(), null);
+        var result = await _bookController.Update(Mapper.ToUpdate());
 
         //Assert
         Assert.That(result, Is.Not.Null);
@@ -222,5 +233,12 @@ public class BookControllerTest
         Assert.IsInstanceOf<JsonResult>(result);
         _bookServiceMock.Verify(service => service.SearchTitle(It.IsAny<string>()), Times.Once);
 
+    }
+
+    [Test]
+    public async Task CheckAddBook_InvalidFileFormat_ReturnFileExtenstionNotValid()
+    {
+        var file = Path.Combine(_env.ContentRootPath, "text.txt");
+        var fileBytes = await File.ReadAllBytesAsync(file);
     }
 }

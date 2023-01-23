@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Wookiee.Service.Interface;
 using Wookiee.Service.Model.Book;
+using Wookiee.Utility;
 using Wookiee.WebAppApi.PostData.Book;
 
 namespace Wookiee.WebAppApi.Controllers
@@ -15,31 +16,36 @@ namespace Wookiee.WebAppApi.Controllers
         #region fields
 
         private readonly IBookService _bookService;
+        private readonly IHelper _helper;
 
         #endregion
 
         #region constructors
 
-        public BookController(IBookService bookService)
+        public BookController(IBookService bookService, IHelper helper)
         {
             _bookService = bookService;
+            _helper = helper;
         }
 
         #endregion
-        
-        #region methods
 
+        #region methods
+        
         [HttpPost]
         [Authorize]
         [Route("create")]
-        public async Task<IActionResult> Create([FromForm] Create request, IFormFile? image)
+        public async Task<IActionResult> Create([FromForm] Create request)
         {
             if (!ModelState.IsValid) return BadRequest();
+
+            var imageValidation = _helper.ImageValidation(request.Image);
+            if (imageValidation.ContainsKey(false)) return BadRequest(imageValidation.Values.FirstOrDefault());
 
             var response = await _bookService.Create(new AddBookDto
             {
                 Description = request.Description,
-                Image = image,
+                Image = request.Image,
                 Price = request.Price,
                 Title = request.Title,
             });
@@ -49,14 +55,17 @@ namespace Wookiee.WebAppApi.Controllers
         [HttpPut]
         [Authorize]
         [Route("update")]
-        public async Task<IActionResult> Update([FromForm] Update request, IFormFile? image)
+        public async Task<IActionResult> Update([FromForm] Update request)
         {
             if (!ModelState.IsValid) return BadRequest();
+
+            var imageValidation = _helper.ImageValidation(request.Image);
+            if (imageValidation.ContainsKey(false)) return BadRequest(imageValidation.Values.FirstOrDefault());
 
             var response = await _bookService.Update(new UpdateBookDto
             {
                 Description = request.Description,
-                Image = image,
+                Image = request.Image,
                 Price = request.Price,
                 Title = request.Title,
                 Id = request.Id,

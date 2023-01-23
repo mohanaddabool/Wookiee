@@ -11,6 +11,7 @@ public interface IHelper
     string? GetLoggedId();
     string CreateToken(string? userId, string? userName);
     string? ReadImage(IFormFile? image);
+    Dictionary<bool, string?> ImageValidation(IFormFile? image);
 }
 
 public class Helper : IHelper
@@ -67,6 +68,19 @@ public class Helper : IHelper
         image.CopyTo(ms);
         var fileBytes = ms.ToArray();
         return fileBytes.Length > 0 ? GetImageAsBase64(fileBytes) : null;
+    }
+
+    public Dictionary<bool, string?> ImageValidation(IFormFile? image)
+    {
+        if (image == null) return new Dictionary<bool, string?> { { true, null } };
+
+        if (image?.Length >= 200000) return new Dictionary<bool, string?> {{false, "File is too big, limit is 200kb"}};
+
+        var imageExtension = Path.GetExtension(image!.FileName);
+        var acceptedFileExtenstion = new List<string> {".jpg", ".jpeg", ".png", ".gif"};
+        if (!acceptedFileExtenstion.Contains(imageExtension.ToLower()))
+            return new Dictionary<bool, string?> {{false, "Not valid file extenstion"}};
+        return new Dictionary<bool, string?>{ {true, null } };
     }
 
     private string? GetImageAsBase64(byte[] image)

@@ -46,7 +46,7 @@ public class BookRepository: IBookRepository
 
     public async Task<List<Book>?> ReadList()
     {
-        return await _context.Books.Where(x => x.IsPublished).ToListAsync();
+        return await _context.Books.Include(u => u.Author).Where(x => x.IsPublished).ToListAsync();
     }
 
     public async Task<Book?> ReadBook(int id)
@@ -56,17 +56,17 @@ public class BookRepository: IBookRepository
 
     public async Task<List<Book>?> SearchTitle(string searchQuery)
     {
-        return await _context.Books.Where(b => EF.Functions.Like(b.Title, $"%{searchQuery}%") && b.IsPublished).ToListAsync();
+        return await _context.Books.Include(u => u.Author).Where(b => EF.Functions.Like(b.Title, $"%{searchQuery}%") && b.IsPublished).ToListAsync();
     }
 
     public async Task<List<Book>?> SearchDescription(string searchQuery)
     {
-        return await _context.Books.Where(b => EF.Functions.Like(b.Description, $"%{searchQuery}%") && b.IsPublished).ToListAsync();
+        return await _context.Books.Include(u => u.Author).Where(b => EF.Functions.Like(b.Description, $"%{searchQuery}%") && b.IsPublished).ToListAsync();
     }
 
     public async Task<List<Book>?> SearchAuthor(List<string> authorIds)
     {
-        return await _context.Books.Include(x => x.Author).Where(b => authorIds.Contains(b.Author!.Id) && b.IsPublished).ToListAsync();
+        return await _context.Books.Include(u => u.Author).Where(b => authorIds.Contains(b.Author!.Id) && b.IsPublished).ToListAsync();
     }
 
     #endregion
