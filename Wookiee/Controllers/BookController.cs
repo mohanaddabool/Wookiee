@@ -85,7 +85,7 @@ namespace Wookiee.WebAppApi.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [AllowAnonymous]
         [Route("get/{id}")]
         public async Task<IActionResult> GetDetail(int id)
         {
@@ -96,7 +96,7 @@ namespace Wookiee.WebAppApi.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [AllowAnonymous]
         [Route("getlist")]
         public async Task<IActionResult> GetList()
         {
