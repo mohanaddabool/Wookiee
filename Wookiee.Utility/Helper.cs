@@ -11,7 +11,7 @@ public interface IHelper
     string? GetLoggedId();
     string CreateToken(string? userId, string? userName);
     string? ImageToBase64(IFormFile? image);
-    Dictionary<bool, string?> ImageValidation(IFormFile? image);
+    (bool isSucess, string? errorMessage) ImageValidation(IFormFile? image);
 }
 
 public class Helper : IHelper
@@ -70,15 +70,17 @@ public class Helper : IHelper
         return fileBytes.Length > 0 ? GetImageAsBase64(fileBytes) : null;
     }
 
-    public Dictionary<bool, string?> ImageValidation(IFormFile? image)
+    public (bool isSucess, string? errorMessage) ImageValidation(IFormFile? image)
     {
-        if (image == null) return new Dictionary<bool, string?> { { true, null } };
+        if (image == null) return (true, null);
 
-        if (image.Length >= 200000) return new Dictionary<bool, string?> {{false, "File is too big, limit is 200kb"}};
+        if (image.Length >= 200000) return (false, "File is too big, limit is 200kb");
 
         var imageExtension = Path.GetExtension(image.FileName);
         var acceptedFileExtenstion = new List<string> {".jpg", ".jpeg", ".png", ".gif"};
-        return !acceptedFileExtenstion.Contains(imageExtension.ToLower()) ? new Dictionary<bool, string?> {{false, "Not valid file extenstion"}} : new Dictionary<bool, string?>{ {true, null } };
+        return !acceptedFileExtenstion.Contains(imageExtension.ToLower())
+            ? (false, "Not valid file extenstion")
+            : (true, null);
     }
 
     private string GetImageAsBase64(byte[] image)
