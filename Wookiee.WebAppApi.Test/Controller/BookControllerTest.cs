@@ -225,11 +225,4 @@ public class BookControllerTest
         _bookServiceMock.Verify(service => service.SearchTitle(It.IsAny<string>()), Times.Once);
 
     }
-
-    [Test]
-    public async Task CheckAddBook_InvalidFileFormat_ReturnFileExtenstionNotValid()
-    {
-        var file = Path.Combine(_env.ContentRootPath, "text.txt");
-        var fileBytes = await File.ReadAllBytesAsync(file);
-    }
 }
