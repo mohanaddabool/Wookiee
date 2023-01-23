@@ -40,7 +40,7 @@ namespace Wookiee.WebAppApi.Controllers
             if (!ModelState.IsValid) return BadRequest();
 
             var imageValidation = _helper.ImageValidation(request.Image);
-            if (imageValidation.ContainsKey(false)) return BadRequest(imageValidation.Values.FirstOrDefault());
+            if (!imageValidation.isSucess) return BadRequest(imageValidation.errorMessage);
 
             var response = await _bookService.Create(new AddBookDto
             {
@@ -60,7 +60,7 @@ namespace Wookiee.WebAppApi.Controllers
             if (!ModelState.IsValid) return BadRequest();
 
             var imageValidation = _helper.ImageValidation(request.Image);
-            if (imageValidation.ContainsKey(false)) return BadRequest(imageValidation.Values.FirstOrDefault());
+            if (!imageValidation.isSucess) return BadRequest(imageValidation.errorMessage);
 
             var response = await _bookService.Update(new UpdateBookDto
             {
@@ -85,7 +85,7 @@ namespace Wookiee.WebAppApi.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [AllowAnonymous]
         [Route("get/{id}")]
         public async Task<IActionResult> GetDetail(int id)
         {
@@ -96,7 +96,7 @@ namespace Wookiee.WebAppApi.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [AllowAnonymous]
         [Route("getlist")]
         public async Task<IActionResult> GetList()
         {

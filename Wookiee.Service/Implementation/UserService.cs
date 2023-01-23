@@ -46,13 +46,16 @@ public class UserService: IUserService
                 user.Password!);
 
             return identityResult.Succeeded 
-                ? Mapper.user.MapToUserResponseObject.ToResponseObject("User is created", identityResult.Succeeded, null, null)
-                : Mapper.user.MapToUserResponseObject.ToResponseObject(null, identityResult.Succeeded, identityResult.Errors.Select(x => x.Description), null);
+                ? Mapper.user.MapToUserResponseObject.ToResponseObject("User is created", identityResult.Succeeded,
+                    null, null)
+                : Mapper.user.MapToUserResponseObject.ToResponseObject(null, identityResult.Succeeded,
+                    identityResult.Errors.Select(x => x.Description), null);
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Register user going wrong");
-            return Mapper.user.MapToUserResponseObject.ToResponseObject(null, false, e.Message, e);
+            return Mapper.user.MapToUserResponseObject.ToResponseObject(null, false,
+                e.Message, e);
         }
     }
 

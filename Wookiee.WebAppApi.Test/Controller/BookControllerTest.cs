@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using Wookiee.Service.Interface;
@@ -65,7 +66,7 @@ public class BookControllerTest
         // Arrange
         _bookServiceMock.Setup(service => service.Create(It.IsAny<AddBookDto>()))
             .ReturnsAsync(Mapper.ToResponseObject);
-        _helperMock.Setup(method => method.ImageValidation(null)).Returns(new Dictionary<bool, string?> { { true, null } });
+        _helperMock.Setup(method => method.ImageValidation(null)).Returns((true, null));
 
         // Act
         var result = await _bookController.Create(Mapper.ToCreate());
@@ -82,7 +83,7 @@ public class BookControllerTest
         // Arrange
         _bookServiceMock.Setup(service => service.Update(It.IsAny<UpdateBookDto>()))
             .ReturnsAsync(Mapper.ToResponseObject);
-        _helperMock.Setup(method => method.ImageValidation(null)).Returns(new Dictionary<bool, string?> {{true, null}});
+        _helperMock.Setup(method => method.ImageValidation(null)).Returns((true, null));
 
         // Act
         var result = await _bookController.Update(Mapper.ToUpdate());
@@ -97,7 +98,7 @@ public class BookControllerTest
     public async Task CheckGetList_WithoutInput_ReturnCorrectResult()
     {
         // Arrange
-        _bookServiceMock.Setup(service => service.ReadList())
+        _bookServiceMock.Setup(service => service.ReadList())!
             .ReturnsAsync(Mapper.ToListResponseObject);
 
         // Act
@@ -224,5 +225,27 @@ public class BookControllerTest
         Assert.IsInstanceOf<JsonResult>(result);
         _bookServiceMock.Verify(service => service.SearchTitle(It.IsAny<string>()), Times.Once);
 
+    }
+
+    [Test]
+    public async Task CheckUploadFile_InvalidExtension_ReturnBadRequest()
+    {
+        _helperMock.Setup(x => x.ImageValidation(It.IsAny<IFormFile>()))
+            .Returns((false, "Invalid image extension"));
+
+        var result = (BadRequestObjectResult) await _bookController.Create(Mapper.ToInvalidUploadFile());
+        Assert.AreEqual(400, result.StatusCode);
+        _bookServiceMock.Verify(method => method.Create(It.IsAny<AddBookDto>()), Times.Never);
+    }
+
+    [Test]
+    public async Task CheckUploadFile_UpLimitOfFile_ReturnBadRequest()
+    {
+        _helperMock.Setup(x => x.ImageValidation(Mapper.InvalidImageLimit()))
+            .Returns((false, "File is too big, limit is 200kb"));
+
+        var result = (BadRequestObjectResult)await _bookController.Create(Mapper.ToInvalidFileLimit());
+        Assert.AreEqual(400, result.StatusCode);
+        _bookServiceMock.Verify(method => method.Create(It.IsAny<AddBookDto>()), Times.Never);
     }
 }
