@@ -31,14 +31,14 @@ public class BookRepository: IBookRepository
         return book.Entity.Id;
     }
 
-    public async void DeleteBook(int id)
+    public async Task DeleteBook(int id)
     {
         var book = await _context.Books.FindAsync(id);
         book!.IsPublished = false;
         await _context.SaveChangesAsync();
     }
 
-    public async void UpdateBook(Book update)
+    public async Task UpdateBook(Book update)
     {
         _context.Books.Update(update);
         await _context.SaveChangesAsync();

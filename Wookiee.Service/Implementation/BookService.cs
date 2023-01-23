@@ -5,6 +5,8 @@ using Wookiee.Service.Interface;
 using Wookiee.Service.Model.Book;
 using Wookiee.Utility;
 using Wookiee.Utility.Response;
+using Wookiee.Service.Mapper.book;
+using Azure;
 
 namespace Wookiee.Service.Implementation;
 
@@ -40,14 +42,9 @@ public class BookService: IBookService
         {
             var userId = _helper.GetLoggedId();
             if (string.IsNullOrWhiteSpace(userId))
-                return new ResponseObject<BookInfoDto>
-                {
-                    Exception = null,
-                    ErrorMessage = "User not authenticated",
-                    IsSuccess = false,
-                    Result = null
-                };
+                return MapToBookResponseObject.ToBookInfoDto(null, false, "User not authenticated", null);
 
+            // TODO use another method
             var isDarthVader = await IsDarthVader(userId);
 
             var bookId = await _bookRepository.CreateBook(new Book
@@ -60,41 +57,14 @@ public class BookService: IBookService
                 Title = add.Title,
             });
             var book = await _bookRepository.ReadBook(bookId);
-            if (book == null)
-                return new ResponseObject<BookInfoDto>
-                {
-                    Exception = null,
-                    ErrorMessage = "Book not found",
-                    IsSuccess = false,
-                    Result = null
-                };
-
-            return new ResponseObject<BookInfoDto>
-            {
-                Result = new BookInfoDto
-                {
-                    Description = book.Description,
-                    Image = book.Image,
-                    Price = book.Price,
-                    Title = book.Title,
-                    AuthorName = book.Author?.AuthorPseudonym,
-                    BookId = book.Id,
-                },
-                ErrorMessage = null,
-                Exception = null,
-                IsSuccess = true,
-            };
+            return book == null 
+                ? MapToBookResponseObject.ToBookInfoDto(null, false, "Book not found", null) 
+                : MapToBookResponseObject.ToBookInfoDto(book, true, null, null);
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return new ResponseObject<BookInfoDto>
-            {
-                Exception = e,
-                ErrorMessage = e.Message,
-                IsSuccess = false,
-                Result = null,
-            };
+            return MapToBookResponseObject.ToBookInfoDto(null, false, e.Message, e);
         }
     }
 
@@ -103,41 +73,14 @@ public class BookService: IBookService
         try
         {
             var book = await _bookRepository.ReadBook(id);
-            if (book == null)
-                return new ResponseObject<BookInfoDto>
-                {
-                    Exception = null,
-                    ErrorMessage = "Book not found",
-                    IsSuccess = false,
-                    Result = null
-                };
-
-            return new ResponseObject<BookInfoDto>
-            {
-                Result = new BookInfoDto
-                {
-                    Description = book.Description,
-                    Image = book.Image,
-                    Price = book.Price,
-                    Title = book.Title,
-                    AuthorName = book.Author?.AuthorPseudonym,
-                    BookId = book.Id
-                },
-                Exception = null,
-                ErrorMessage = null,
-                IsSuccess = true,
-            };
+            return book == null 
+                ? MapToBookResponseObject.ToBookInfoDto(null, false, "Book not found", null)
+                : MapToBookResponseObject.ToBookInfoDto(book, true, null, null);
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return new ResponseObject<BookInfoDto>
-            {
-                Result = null,
-                Exception = e,
-                ErrorMessage = e.Message,
-                IsSuccess = false,
-            };
+            return MapToBookResponseObject.ToBookInfoDto(null, false, e.Message, e);
         }
     }
 
@@ -147,7 +90,12 @@ public class BookService: IBookService
         {
             var book = await _bookRepository.ReadBook(update.Id);
             if (book == null)
-                return new ResponseObject<BookInfoDto> { Exception = null, ErrorMessage = "Book not found", IsSuccess = false, Result = null };
+                return MapToBookResponseObject.ToBookInfoDto(null, false, "Book not found", null);
+
+            if (!book.Author!.Id.Equals(_helper.GetLoggedId()))
+            {
+                return MapToBookResponseObject.ToBookInfoDto(null, false, "This book is not owned by you", null);
+            }
 
             book.Image = _helper.ReadImage(update.Image);
             book.Price = update.Price;
@@ -155,92 +103,51 @@ public class BookService: IBookService
             book.Description = update.Description;
             book.Id = update.Id;
 
-            _bookRepository.UpdateBook(book);
+            await _bookRepository.UpdateBook(book);
 
             return await Read(book.Id);
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return new ResponseObject<BookInfoDto>
-            {
-                Result = null,
-                Exception = e,
-                ErrorMessage = e.Message,
-                IsSuccess = false,
-            };
+            return MapToBookResponseObject.ToBookInfoDto(null, false, e.Message, e);
         }
     }
 
-    public async Task<ResponseObject<List<BookInfoDto>>> Delete(int id)
+    public async Task<ResponseObject<List<BookInfoDto>?>> Delete(int id)
     {
         try
         {
             var book = await _bookRepository.ReadBook(id);
             if (book == null)
-                return new ResponseObject<List<BookInfoDto>>
-                {
-                    Exception = null,
-                    ErrorMessage = "Book not found",
-                    IsSuccess = false,
-                    Result = null
-                };
+                return MapToBookResponseObject.ToListBookInfoDto(null, false, "Book not found", null);
 
             if (!book.Author!.Id.Equals(_helper.GetLoggedId()))
             {
-                return new ResponseObject<List<BookInfoDto>>
-                {
-                    ErrorMessage = "This book is not owned by you",
-                    IsSuccess = false,
-                    Exception = null,
-                    Result = null,
-                };
+                return MapToBookResponseObject.ToListBookInfoDto(null, false, "This book is not owned by you", null);
             }
 
-            _bookRepository.DeleteBook(id);
+            await _bookRepository.DeleteBook(id);
             return await ReadList();
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return new ResponseObject<List<BookInfoDto>>
-            {
-                Exception = e,
-                ErrorMessage = e.Message,
-                IsSuccess = false,
-                Result = null,
-            };
+            return MapToBookResponseObject.ToListBookInfoDto(null, false, e.Message, e);
         }
     }
 
-    public async Task<ResponseObject<List<BookInfoDto>>> ReadList()
+    public async Task<ResponseObject<List<BookInfoDto>?>> ReadList()
     {
         try
         {
             var response = await _bookRepository.ReadList();
-            return new ResponseObject<List<BookInfoDto>>
-            {
-                Result = response?.Select(item => new BookInfoDto
-                {
-                    Price = item.Price,
-                    Title = item.Title,
-                    AuthorName = item.Author?.AuthorPseudonym,
-                }).ToList(),
-                Exception = null,
-                ErrorMessage = null,
-                IsSuccess = true,
-            };
+            return MapToBookResponseObject.ToListBookInfoDto(response, true, null, null);
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return new ResponseObject<List<BookInfoDto>>
-            {
-                Result = null,
-                Exception = e,
-                ErrorMessage = e.Message,
-                IsSuccess = false,
-            };
+            return MapToBookResponseObject.ToListBookInfoDto(null, false, e.Message, e);
         }
     }
 
@@ -250,40 +157,15 @@ public class BookService: IBookService
         {
             var authorIds = await _userRepository.FindByAuthorName(authorPseudonym);
             if (authorIds == null)
-            {
-                return new ResponseObject<List<BookInfoDto>?>
-                {
-                    Exception = null,
-                    ErrorMessage = null,
-                    IsSuccess = true,
-                    Result = null,
-                };
-            }
+                return MapToBookResponseObject.ToListBookInfoDto(null, true, "No result", null);
 
             var books = await _bookRepository.SearchAuthor(authorIds);
-            return new ResponseObject<List<BookInfoDto>?>
-            {
-                Exception = null,
-                ErrorMessage = null,
-                IsSuccess = true,
-                Result = books?.Select(item => new BookInfoDto
-                {
-                    Price = item.Price,
-                    Title = item.Title,
-                    AuthorName = item.Author?.AuthorPseudonym,
-                }).ToList(),
-            };
+            return MapToBookResponseObject.ToListBookInfoDto(books, true, null, null);
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return new ResponseObject<List<BookInfoDto>?>
-            {
-                Exception = e,
-                ErrorMessage = e.Message,
-                IsSuccess = true,
-                Result = null,
-            };
+            return MapToBookResponseObject.ToListBookInfoDto(null, false, e.Message, e);
         }
     }
 
@@ -292,29 +174,12 @@ public class BookService: IBookService
         try
         {
             var books = await _bookRepository.SearchTitle(title);
-            return new ResponseObject<List<BookInfoDto>?>
-            {
-                Exception = null,
-                ErrorMessage = null,
-                IsSuccess = true,
-                Result = books?.Select(b => new BookInfoDto
-                {
-                    AuthorName = b.Author?.AuthorPseudonym,
-                    Title = b.Title,
-                    Price = b.Price,
-                }).ToList()
-            };
+            return MapToBookResponseObject.ToListBookInfoDto(books, true, null, null);
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return new ResponseObject<List<BookInfoDto>?>
-            {
-                Result = null,
-                Exception = e,
-                ErrorMessage = e.Message,
-                IsSuccess = false,
-            };
+            return MapToBookResponseObject.ToListBookInfoDto(null, false, e.Message, e);
         }
     }
 
@@ -323,29 +188,12 @@ public class BookService: IBookService
         try
         {
             var books = await _bookRepository.SearchTitle(description);
-            return new ResponseObject<List<BookInfoDto>?>
-            {
-                Exception = null,
-                ErrorMessage = null,
-                IsSuccess = true,
-                Result = books?.Select(b => new BookInfoDto
-                {
-                    AuthorName = b.Author?.AuthorPseudonym,
-                    Title = b.Title,
-                    Price = b.Price,
-                }).ToList()
-            };
+            return MapToBookResponseObject.ToListBookInfoDto(books, true, null, null);
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return new ResponseObject<List<BookInfoDto>?>
-            {
-                Result = null,
-                Exception = e,
-                ErrorMessage = e.Message,
-                IsSuccess = false,
-            };
+            return MapToBookResponseObject.ToListBookInfoDto(null, false, e.Message, e);
         }
     }
 

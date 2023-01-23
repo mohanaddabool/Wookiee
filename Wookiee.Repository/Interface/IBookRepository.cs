@@ -5,8 +5,8 @@ namespace Wookiee.Repository.Interface;
 public interface IBookRepository
 {
     Task<int> CreateBook(Book create);
-    void DeleteBook(int id);
-    void UpdateBook(Book update);
+    Task DeleteBook(int id);
+    Task UpdateBook(Book update);
     Task<List<Book>?> ReadList();
     Task<Book?> ReadBook(int id);
     Task<List<Book>?> SearchTitle(string searchQuery);
