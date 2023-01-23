@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using Wookiee.Model.Entities;
 using Wookiee.Service.Interface;
 using Wookiee.Service.Model.User;
-using Wookiee.Utility.Response;
 using Wookiee.WebAppApi.Controllers;
-using Wookiee.WebAppApi.PostData.User;
 using Wookiee.WebAppApi.Test.Model.User;
 
 namespace Wookiee.WebAppApi.Test.Controller;

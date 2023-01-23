@@ -97,7 +97,7 @@ public class BookControllerTest
     public async Task CheckGetList_WithoutInput_ReturnCorrectResult()
     {
         // Arrange
-        _bookServiceMock.Setup(service => service.ReadList())
+        _bookServiceMock.Setup(service => service.ReadList())!
             .ReturnsAsync(Mapper.ToListResponseObject);
 
         // Act

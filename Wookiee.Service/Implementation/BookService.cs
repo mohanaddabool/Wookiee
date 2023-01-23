@@ -6,7 +6,6 @@ using Wookiee.Service.Model.Book;
 using Wookiee.Utility;
 using Wookiee.Utility.Response;
 using Wookiee.Service.Mapper.book;
-using Azure;
 
 namespace Wookiee.Service.Implementation;
 
@@ -43,10 +42,8 @@ public class BookService: IBookService
             var userId = _helper.GetLoggedId();
             if (string.IsNullOrWhiteSpace(userId))
                 return MapToBookResponseObject.ToBookInfoDto(null, false, "User not authenticated", null);
-
-            // TODO use another method
+            
             var isDarthVader = await IsDarthVader(userId);
-
             var bookId = await _bookRepository.CreateBook(new Book
             {
                 IsPublished = !isDarthVader,
@@ -90,12 +87,12 @@ public class BookService: IBookService
         {
             var book = await _bookRepository.ReadBook(update.Id);
             if (book == null)
-                return MapToBookResponseObject.ToBookInfoDto(null, false, "Book not found", null);
+                return MapToBookResponseObject.ToBookInfoDto(null, false,
+                    "Book not found", null);
 
             if (!book.Author!.Id.Equals(_helper.GetLoggedId()))
-            {
-                return MapToBookResponseObject.ToBookInfoDto(null, false, "This book is not owned by you", null);
-            }
+                return MapToBookResponseObject.ToBookInfoDto(null, false,
+                    "This book is not owned by you", null);
 
             book.Image = _helper.ImageToBase64(update.Image);
             book.Price = update.Price;
@@ -120,11 +117,13 @@ public class BookService: IBookService
         {
             var book = await _bookRepository.ReadBook(id);
             if (book == null)
-                return MapToBookResponseObject.ToListBookInfoDto(null, false, "Book not found", null);
+                return MapToBookResponseObject.ToListBookInfoDto(null, false,
+                    "Book not found", null);
 
             if (!book.Author!.Id.Equals(_helper.GetLoggedId()))
             {
-                return MapToBookResponseObject.ToListBookInfoDto(null, false, "This book is not owned by you", null);
+                return MapToBookResponseObject.ToListBookInfoDto(null, false,
+                    "This book is not owned by you", null);
             }
 
             await _bookRepository.DeleteBook(id);
@@ -133,7 +132,8 @@ public class BookService: IBookService
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return MapToBookResponseObject.ToListBookInfoDto(null, false, e.Message, e);
+            return MapToBookResponseObject.ToListBookInfoDto(null, false,
+                e.Message, e);
         }
     }
 
@@ -142,12 +142,14 @@ public class BookService: IBookService
         try
         {
             var response = await _bookRepository.ReadList();
-            return MapToBookResponseObject.ToListBookInfoDto(response, true, null, null);
+            return MapToBookResponseObject.ToListBookInfoDto(response, true,
+                null, null);
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return MapToBookResponseObject.ToListBookInfoDto(null, false, e.Message, e);
+            return MapToBookResponseObject.ToListBookInfoDto(null, false,
+                e.Message, e);
         }
     }
 
@@ -157,15 +159,18 @@ public class BookService: IBookService
         {
             var authorIds = await _userRepository.FindByAuthorName(authorPseudonym);
             if (authorIds == null)
-                return MapToBookResponseObject.ToListBookInfoDto(null, true, "No result", null);
+                return MapToBookResponseObject.ToListBookInfoDto(null, true,
+                    "No result", null);
 
             var books = await _bookRepository.SearchAuthor(authorIds);
-            return MapToBookResponseObject.ToListBookInfoDto(books, true, null, null);
+            return MapToBookResponseObject.ToListBookInfoDto(books, true,
+                null, null);
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return MapToBookResponseObject.ToListBookInfoDto(null, false, e.Message, e);
+            return MapToBookResponseObject.ToListBookInfoDto(null, false,
+                e.Message, e);
         }
     }
 
@@ -174,12 +179,14 @@ public class BookService: IBookService
         try
         {
             var books = await _bookRepository.SearchTitle(title);
-            return MapToBookResponseObject.ToListBookInfoDto(books, true, null, null);
+            return MapToBookResponseObject.ToListBookInfoDto(books, true,
+                null, null);
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return MapToBookResponseObject.ToListBookInfoDto(null, false, e.Message, e);
+            return MapToBookResponseObject.ToListBookInfoDto(null, false,
+                e.Message, e);
         }
     }
 
@@ -188,12 +195,14 @@ public class BookService: IBookService
         try
         {
             var books = await _bookRepository.SearchTitle(description);
-            return MapToBookResponseObject.ToListBookInfoDto(books, true, null, null);
+            return MapToBookResponseObject.ToListBookInfoDto(books, true,
+                null, null);
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return MapToBookResponseObject.ToListBookInfoDto(null, false, e.Message, e);
+            return MapToBookResponseObject.ToListBookInfoDto(null, false,
+                e.Message, e);
         }
     }
 

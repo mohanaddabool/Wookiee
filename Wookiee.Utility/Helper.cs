@@ -74,16 +74,14 @@ public class Helper : IHelper
     {
         if (image == null) return new Dictionary<bool, string?> { { true, null } };
 
-        if (image?.Length >= 200000) return new Dictionary<bool, string?> {{false, "File is too big, limit is 200kb"}};
+        if (image.Length >= 200000) return new Dictionary<bool, string?> {{false, "File is too big, limit is 200kb"}};
 
-        var imageExtension = Path.GetExtension(image!.FileName);
+        var imageExtension = Path.GetExtension(image.FileName);
         var acceptedFileExtenstion = new List<string> {".jpg", ".jpeg", ".png", ".gif"};
-        if (!acceptedFileExtenstion.Contains(imageExtension.ToLower()))
-            return new Dictionary<bool, string?> {{false, "Not valid file extenstion"}};
-        return new Dictionary<bool, string?>{ {true, null } };
+        return !acceptedFileExtenstion.Contains(imageExtension.ToLower()) ? new Dictionary<bool, string?> {{false, "Not valid file extenstion"}} : new Dictionary<bool, string?>{ {true, null } };
     }
 
-    private string? GetImageAsBase64(byte[] image)
+    private string GetImageAsBase64(byte[] image)
     {
         return Convert.ToBase64String(image);
     }
