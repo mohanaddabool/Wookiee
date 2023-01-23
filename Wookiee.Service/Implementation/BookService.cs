@@ -52,7 +52,7 @@ public class BookService: IBookService
                 IsPublished = !isDarthVader,
                 Author = await _userRepository.FindById(userId),
                 Description = add.Description,
-                Image = add.Image != null ? _helper.ReadImage(add.Image) : null,
+                Image = add.Image != null ? _helper.ImageToBase64(add.Image) : null,
                 Price = add.Price,
                 Title = add.Title,
             });
@@ -97,7 +97,7 @@ public class BookService: IBookService
                 return MapToBookResponseObject.ToBookInfoDto(null, false, "This book is not owned by you", null);
             }
 
-            book.Image = _helper.ReadImage(update.Image);
+            book.Image = _helper.ImageToBase64(update.Image);
             book.Price = update.Price;
             book.Title = update.Title;
             book.Description = update.Description;

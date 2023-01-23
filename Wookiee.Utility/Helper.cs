@@ -10,7 +10,7 @@ public interface IHelper
 {
     string? GetLoggedId();
     string CreateToken(string? userId, string? userName);
-    string? ReadImage(IFormFile? image);
+    string? ImageToBase64(IFormFile? image);
     Dictionary<bool, string?> ImageValidation(IFormFile? image);
 }
 
@@ -57,7 +57,7 @@ public class Helper : IHelper
         return tokenHandler.WriteToken(token);
     }
 
-    public string? ReadImage(IFormFile? image)
+    public string? ImageToBase64(IFormFile? image)
     {
         if (image == null) return null;
         var length = image.Length;
