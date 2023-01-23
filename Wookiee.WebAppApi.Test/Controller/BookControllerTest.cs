@@ -1,19 +1,10 @@
-﻿using Castle.Components.DictionaryAdapter.Xml;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting.Internal;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.AspNetCore.Mvc;
 using Moq;
-using NuGet.Frameworks;
 using NUnit.Framework;
-using System.Collections;
 using Wookiee.Service.Interface;
 using Wookiee.Service.Model.Book;
-using Wookiee.Service.Model.User;
 using Wookiee.Utility;
 using Wookiee.WebAppApi.Controllers;
-using Wookiee.WebAppApi.Test.Helper;
 using Wookiee.WebAppApi.Test.Model.Book;
 
 namespace Wookiee.WebAppApi.Test.Controller;
