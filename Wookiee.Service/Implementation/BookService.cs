@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Wookiee.Model.Entities;
 using Wookiee.Repository.Interface;
+using Wookiee.Service.ImageManager;
 using Wookiee.Service.Interface;
 using Wookiee.Service.Model.Book;
 using Wookiee.Utility;
@@ -18,17 +19,19 @@ public class BookService: IBookService
     private readonly IHelper _helper;
     private readonly IUserRepository _userRepository;
     private const string DarthVader = "Darth Vader";
+    private readonly IAmImageManager _amImageManager;
 
     #endregion
 
     #region constructor
 
-    public BookService(ILogger<BookService> logger, IBookRepository bookRepository, IHelper helper, IUserRepository userRepository)
+    public BookService(ILogger<BookService> logger, IBookRepository bookRepository, IHelper helper, IUserRepository userRepository, IAmImageManager amImageManager)
     {
         _logger = logger;
         _bookRepository = bookRepository;
         _helper = helper;
         _userRepository = userRepository;
+        _amImageManager = amImageManager;
     }
 
     #endregion
@@ -41,7 +44,7 @@ public class BookService: IBookService
         {
             var userId = _helper.GetLoggedId();
             if (string.IsNullOrWhiteSpace(userId))
-                return MapToBookResponseObject.ToBookInfoDto(null, false, "User not authenticated", null);
+                return await MapToBookResponseObject.ToBookInfoDto(null, false, "User not authenticated", null, _amImageManager);
             
             var isDarthVader = await IsDarthVader(userId);
             var bookId = await _bookRepository.CreateBook(new Book
@@ -49,19 +52,19 @@ public class BookService: IBookService
                 IsPublished = !isDarthVader,
                 Author = await _userRepository.FindById(userId),
                 Description = add.Description,
-                Image = add.Image != null ? _helper.ImageToBase64(add.Image) : null,
+                Image = add.Image != null ? await _amImageManager.UploadImage(add.Image) : null,
                 Price = add.Price,
                 Title = add.Title,
             });
             var book = await _bookRepository.ReadBook(bookId);
             return book == null 
-                ? MapToBookResponseObject.ToBookInfoDto(null, false, "Book not found", null) 
-                : MapToBookResponseObject.ToBookInfoDto(book, true, null, null);
+                ? await MapToBookResponseObject.ToBookInfoDto(null, false, "Book not found", null, _amImageManager) 
+                : await MapToBookResponseObject.ToBookInfoDto(book, true, null, null, _amImageManager);
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return MapToBookResponseObject.ToBookInfoDto(null, false, e.Message, e);
+            return await MapToBookResponseObject.ToBookInfoDto(null, false, e.Message, e, _amImageManager);
         }
     }
 
@@ -71,13 +74,13 @@ public class BookService: IBookService
         {
             var book = await _bookRepository.ReadBook(id);
             return book == null 
-                ? MapToBookResponseObject.ToBookInfoDto(null, false, "Book not found", null)
-                : MapToBookResponseObject.ToBookInfoDto(book, true, null, null);
+                ? await MapToBookResponseObject.ToBookInfoDto(null, false, "Book not found", null, _amImageManager)
+                : await MapToBookResponseObject.ToBookInfoDto(book, true, null, null, _amImageManager);
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return MapToBookResponseObject.ToBookInfoDto(null, false, e.Message, e);
+            return await MapToBookResponseObject.ToBookInfoDto(null, false, e.Message, e, _amImageManager);
         }
     }
 
@@ -87,14 +90,12 @@ public class BookService: IBookService
         {
             var book = await _bookRepository.ReadBook(update.Id);
             if (book == null)
-                return MapToBookResponseObject.ToBookInfoDto(null, false,
-                    "Book not found", null);
+                return await MapToBookResponseObject.ToBookInfoDto(null, false, "Book not found", null, _amImageManager);
 
             if (!book.Author!.Id.Equals(_helper.GetLoggedId()))
-                return MapToBookResponseObject.ToBookInfoDto(null, false,
-                    "This book is not owned by you", null);
+                return await MapToBookResponseObject.ToBookInfoDto(null, false, "This book is not owned by you", null, _amImageManager);
 
-            book.Image = _helper.ImageToBase64(update.Image);
+            // book.Image = _helper.ImageToBase64(update.Image);
             book.Price = update.Price;
             book.Title = update.Title;
             book.Description = update.Description;
@@ -107,7 +108,7 @@ public class BookService: IBookService
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return MapToBookResponseObject.ToBookInfoDto(null, false, e.Message, e);
+            return await MapToBookResponseObject.ToBookInfoDto(null, false, e.Message, e, _amImageManager);
         }
     }
 

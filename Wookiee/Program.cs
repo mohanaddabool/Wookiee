@@ -4,9 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using Wookiee.Repository.Context;
 using Wookiee.Repository.Implementation;
 using Wookiee.Repository.Interface;
+using Wookiee.Service.ImageManager;
 using Wookiee.Service.Implementation;
 using Wookiee.Service.Interface;
 using Wookiee.Utility;
@@ -35,6 +37,8 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
 {
+    
+
     c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
         Description = "Standard Authorization header user",
@@ -132,4 +136,5 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<IUserRepository, UserRepository>();
     services.AddScoped<IBookRepository, BookRepository>();
     services.AddScoped<IHelper, Helper>();
+    services.AddScoped<IAmImageManager, ImageManager>();
 }

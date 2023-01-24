@@ -35,4 +35,5 @@ public class WookieeContext: IdentityDbContext<IdentityUser>
 
     public DbSet<User> User { get; set; }
     public DbSet<Book> Books { get; set; }
+    public DbSet<Image> Images { get; set; }
 }

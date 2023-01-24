@@ -1,4 +1,5 @@
 ﻿using Wookiee.Model.Entities;
+using Wookiee.Service.ImageManager;
 using Wookiee.Service.Model.Book;
 using Wookiee.Utility.Response;
 
@@ -6,7 +7,7 @@ namespace Wookiee.Service.Mapper.book;
 
 public static class MapToBookResponseObject
 {
-    public static ResponseObject<BookInfoDto> ToBookInfoDto(Book? result, bool isSuccess, string? errorMessage, Exception? exception)
+    public static async Task<ResponseObject<BookInfoDto>> ToBookInfoDto(Book? result, bool isSuccess, string? errorMessage, Exception? exception, IAmImageManager manage)
     {
         return new ResponseObject<BookInfoDto>
         {
@@ -15,7 +16,7 @@ public static class MapToBookResponseObject
             ErrorMessage = errorMessage,
             Result = result != null ? new BookInfoDto
             {
-                Image = result.Image,
+                Image = result.Image?.ImageId != null ? await manage.LoadImage(result.Image.ImageId, result.Image.Extension) : null,
                 Description = result.Description,
                 Price = result.Price,
                 AuthorName = result.Author!.AuthorPseudonym,

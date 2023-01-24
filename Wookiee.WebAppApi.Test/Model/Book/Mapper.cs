@@ -41,7 +41,7 @@ public static class Mapper
             {
                 Description = "Test description",
                 Price = 50.50M,
-                Image = string.Empty,
+                // Image = string.Empty,
                 AuthorName = "Test author",
                 BookId = 1,
                 Title = "Test title",
@@ -62,7 +62,7 @@ public static class Mapper
                 {
                     Description = "Test description",
                     Price = 50.50M,
-                    Image = string.Empty,
+                    // Image = string.Empty,
                     AuthorName = "Test author",
                     BookId = 1,
                     Title = "Test title",
