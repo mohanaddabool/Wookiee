@@ -11,11 +11,11 @@ public class Book
     public string? Title { get; set; }
     [NotNull]
     public decimal Price { get; set; }
-    public string? Image { get; set; }
     [NotNull]
     public bool IsPublished { get; set; } = true;
     [NotNull]
     public DateTime CreatedOn { get; set; } = DateTime.Now;
 
     public virtual User? Author { get; set; }
+    public virtual Image? Image { get; set; }
 }

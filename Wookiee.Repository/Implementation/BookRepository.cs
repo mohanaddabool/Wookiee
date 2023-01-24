@@ -51,7 +51,7 @@ public class BookRepository: IBookRepository
 
     public async Task<Book?> ReadBook(int id)
     {
-        return await _context.Books.Include(u => u.Author).FirstOrDefaultAsync(x => x.Id == id && x.IsPublished);
+        return await _context.Books.Include(u => u.Author).Include(i => i.Image).FirstOrDefaultAsync(x => x.Id == id && x.IsPublished);
     }
 
     public async Task<List<Book>?> SearchTitle(string searchQuery)
