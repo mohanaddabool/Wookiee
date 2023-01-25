@@ -13,4 +13,5 @@ public interface IBookService
     Task<ResponseObject<List<BookInfoDto>?>> SearchAuthor(string authorPseudonym);
     Task<ResponseObject<List<BookInfoDto>?>> SearchTitle(string title);
     Task<ResponseObject<List<BookInfoDto>?>> SearchDescription(string description);
+    Task<ResponseObject<ImageDto?>> GetImage(int bookId);
 }

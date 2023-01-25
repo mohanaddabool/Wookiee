@@ -16,7 +16,7 @@ public static class MapToBookResponseObject
             ErrorMessage = errorMessage,
             Result = result != null ? new BookInfoDto
             {
-                Image = result.Image?.ImageId != null ? await manage.LoadImage(result.Image.ImageId, result.Image.Extension) : null,
+                Image = result.Image?.ImageId != null ? await manage.LoadImageAsString(result.Image.ImageId, result.Image.Extension) : null,
                 Description = result.Description,
                 Price = result.Price,
                 AuthorName = result.Author!.AuthorPseudonym,
@@ -38,7 +38,20 @@ public static class MapToBookResponseObject
                 Title = b.Title,
                 AuthorName = b.Author!.AuthorPseudonym,
                 Price = b.Price,
+                BookId = b.Id,
             }).ToList(),
         };
-    } 
+    }
+
+    public static ResponseObject<ImageDto?> ToImageDto(ImageDto? result, bool isSuccess, string? errorMessage,
+        Exception? exception)
+    {
+        return new ResponseObject<ImageDto?>
+        {
+            Exception = exception,
+            IsSuccess = isSuccess,
+            ErrorMessage = errorMessage,
+            Result = result
+        };
+    }
 }

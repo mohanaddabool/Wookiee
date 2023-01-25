@@ -69,6 +69,12 @@ public class BookRepository: IBookRepository
         return await _context.Books.Include(u => u.Author).Where(b => authorIds.Contains(b.Author!.Id) && b.IsPublished).ToListAsync();
     }
 
+    public async Task CreateImage(Image create)
+    {
+        await _context.Images.AddAsync(create);
+        await _context.SaveChangesAsync();
+    }
+
     #endregion
 
 }

@@ -144,6 +144,19 @@ namespace Wookiee.WebAppApi.Controllers
             return response.IsSuccess ? new JsonResult(response.Result) : new JsonResult(response.ErrorMessage);
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("getimage/{bookId}")]
+        public async Task<IActionResult> GetImage(int bookId)
+        {
+            if (bookId < 1) return BadRequest("Not valid book id");
+
+            var response = await _bookService.GetImage(bookId);
+            return response.IsSuccess
+                    ? File(response.Result?.ImageContent!, $"image/{response.Result?.ImageExtension}")
+                    : new JsonResult(response.ErrorMessage);
+        }
+
         #endregion
 
     }
