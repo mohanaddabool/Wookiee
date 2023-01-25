@@ -12,4 +12,5 @@ public interface IBookRepository
     Task<List<Book>?> SearchTitle(string searchQuery);
     Task<List<Book>?> SearchDescription(string searchQuery);
     Task<List<Book>?> SearchAuthor(List<string> authorIds);
+    Task CreateImage(Image image);
 }

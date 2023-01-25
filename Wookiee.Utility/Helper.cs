@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
-using Wookiee.Model.Entities;
 
 namespace Wookiee.Utility;
+
+#region interface
 
 public interface IHelper
 {
@@ -14,6 +15,10 @@ public interface IHelper
     string? ImageToBase64(IFormFile? image);
     (bool isSucess, string? errorMessage) ImageValidation(IFormFile? image);
 }
+
+#endregion
+
+#region implementation
 
 public class Helper : IHelper
 {
@@ -78,14 +83,21 @@ public class Helper : IHelper
         if (image.Length >= 200000) return (false, "File is too big, limit is 200kb");
 
         var imageExtension = Path.GetExtension(image.FileName);
-        var acceptedFileExtenstion = new List<string> {".jpg", ".jpeg", ".png", ".gif"};
+        var acceptedFileExtenstion = new List<string> { ".jpg", ".jpeg", ".png", ".gif" };
         return !acceptedFileExtenstion.Contains(imageExtension.ToLower())
             ? (false, "Not valid file extenstion")
             : (true, null);
     }
 
-    private string GetImageAsBase64(byte[] image)
+    #endregion
+
+    #region private methods
+
+    private static string GetImageAsBase64(byte[] image)
     {
         return Convert.ToBase64String(image);
     }
+
+    #endregion
+
 }

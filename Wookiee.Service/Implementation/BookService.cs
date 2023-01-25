@@ -12,6 +12,7 @@ namespace Wookiee.Service.Implementation;
 
 public class BookService: IBookService
 {
+
     #region field
 
     private readonly ILogger<BookService> _logger;
@@ -95,7 +96,26 @@ public class BookService: IBookService
             if (!book.Author!.Id.Equals(_helper.GetLoggedId()))
                 return await MapToBookResponseObject.ToBookInfoDto(null, false, "This book is not owned by you", null, _amImageManager);
 
-            // book.Image = _helper.ImageToBase64(update.Image);
+            if (update.Image != null)
+            {
+                if (book.Image != null)
+                {
+                    _amImageManager.DeleteImage(book.Image.ImageId);
+                }
+                var image = await _amImageManager.UploadImage(update.Image);
+                image.BookId = book.Id;
+                await _bookRepository.CreateImage(image);
+                book.Image = image;
+            }
+            else
+            {
+                if (book.Image != null)
+                {
+                    _amImageManager.DeleteImage(book.Image.ImageId);
+                }
+                book.Image = null;
+            }
+
             book.Price = update.Price;
             book.Title = update.Title;
             book.Description = update.Description;
@@ -127,6 +147,12 @@ public class BookService: IBookService
                     "This book is not owned by you", null);
             }
 
+            if (book.Image != null)
+            {
+                _amImageManager.DeleteImage(book.Image.ImageId);
+            }
+
+            book.Image = null;
             await _bookRepository.DeleteBook(id);
             return await ReadList();
         }
@@ -204,6 +230,29 @@ public class BookService: IBookService
             _logger.LogError(e, e.Message);
             return MapToBookResponseObject.ToListBookInfoDto(null, false,
                 e.Message, e);
+        }
+    }
+
+    public async Task<ResponseObject<ImageDto?>> GetImage(int bookId)
+    {
+        try
+        {
+            var book = await _bookRepository.ReadBook(bookId);
+            if (book == null) return MapToBookResponseObject.ToImageDto(null, false, "Book not found", null);
+
+            if(book.Image == null) return MapToBookResponseObject.ToImageDto(null, false, "Image not found", null);
+
+            var imageDto = new ImageDto
+            {
+                ImageExtension = book.Image.Extension,
+                ImageContent = await _amImageManager.LoadImageAsBytes(book.Image.ImageId)
+            };
+            return MapToBookResponseObject.ToImageDto(imageDto, true, null, null);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, e.Message);
+            return MapToBookResponseObject.ToImageDto(null, false, e.Message, e);
         }
     }
 
